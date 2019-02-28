@@ -74,7 +74,7 @@ Resources:
               responses: {}
       EndpointConfiguration: REGIONAL
       Variables:
-        stage: Staging
+        stage: staging
   StagingApiKey:
     Type: AWS::ApiGateway::ApiKey
     Properties:
