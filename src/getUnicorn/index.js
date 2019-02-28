@@ -37,14 +37,13 @@ const stagingFleet = [
 exports.handler = async message => {
   console.log(message);
 
-  let unicorn;
-  if (message.requestContext.stageVariables && message.requestContext.stageVariables.stage === 'production') {
-    unicorn = productionFleet[Math.floor(Math.random() * fleet.length)];
-  } else {
-    unicorn = stagingFleet[Math.floor(Math.random() * fleet.length)];
-  }
+  const fleet = (message.requestContext.stageVariables && message.requestContext.stageVariables.stage === 'production') ?
+    productionFleet :
+    stagingFleet;
 
-  console.log(`Sending unicorn: ${unicorn}`);
+  const unicorn = fleet[Math.floor(Math.random() * fleet.length)];
+
+  console.log(`Sending unicorn: ${JSON.stringify(unicorn, null, 2)}`);
 
   return {
     statusCode: 200,
