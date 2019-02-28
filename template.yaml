@@ -1,3 +1,69 @@
-AWSTemplateFormatVersion: '2010-09-09'
-Transform: 'AWS::Serverless-2016-10-31'
-Resources: {}
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  ProductionApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub
+        - ${ResourceName} From Stack ${StackTagName} Environment ${EnvironmentTagName}
+        - ResourceName: ProductionApi
+      StageName: !Ref EnvironmentAPIGatewayStageName
+      DefinitionBody:
+        swagger: '2.0'
+        info: {}
+        paths:
+          /unicorn:
+            get:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetUnicorn.Arn}/invocations
+              responses: {}
+      EndpointConfiguration: REGIONAL
+      Variables:
+        stage: production
+  ProductionApiKey:
+    Type: AWS::ApiGateway:ApiKey
+    Properties:
+      Enabled: true
+      Name: !Sub ${AWS::StackName}-ProductionApiKey
+      StageKeys:
+        - RestApiId: !Ref ProductionApi
+  GetUnicorn:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-GetUnicorn
+      Description: !Sub
+        - Stack ${StackTagName} Environment ${EnvironmentTagName} Function ${ResourceName}
+        - ResourceName: GetUnicorn
+      CodeUri: src/getUnicorn
+      Handler: index.handler
+      Runtime: nodejs8.10
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Policies:
+        - AWSXrayWriteOnlyAccess
+      Events:
+        ProdApiGETunicorn:
+          Type: Api
+          Properties:
+            Path: /unicorn
+            Method: GET
+            RestApiId: !Ref ProdApi
+        StagingApiGETunicorn:
+          Type: Api
+          Properties:
+            Path: /unicorn
+            Method: GET
+            RestApiId: !Ref StagingApi
+Parameters:
+  StackTagName:
+    Type: String
+    Description: Stack Name (injected by Stackery at deployment time)
+  EnvironmentTagName:
+    Type: String
+    Description: Environment Name (injected by Stackery at deployment time)
+  EnvironmentAPIGatewayStageName:
+    Type: String
+    Description: Environment name used for API Gateway Stage names (injected by Stackery at deployment time)
