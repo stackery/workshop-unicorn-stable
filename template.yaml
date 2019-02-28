@@ -23,7 +23,7 @@ Resources:
       Variables:
         stage: production
   ProductionApiKey:
-    Type: AWS::ApiGateway:ApiKey
+    Type: AWS::ApiGateway::ApiKey
     Properties:
       Enabled: true
       Name: !Sub ${AWS::StackName}-ProductionApiKey
