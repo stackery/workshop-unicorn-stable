@@ -47,6 +47,52 @@ Resources:
       KeyId: !Ref ProductionApiKey
       KeyType: API_KEY
       UsagePlanId: !Ref ProductionUsagePlan
+  StagingApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub
+        - ${ResourceName} From Stack ${StackTagName} Environment ${EnvironmentTagName}
+        - ResourceName: StagingApi
+      StageName: !Ref EnvironmentAPIGatewayStageName
+      DefinitionBody:
+        swagger: '2.0'
+        info: {}
+        securityDefinitions:
+          api_key:
+            type: apiKey
+            name: x-api-key
+            in: header
+        paths:
+          /unicorn:
+            get:
+              security:
+                - api_key: []
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetUnicorn.Arn}/invocations
+              responses: {}
+      EndpointConfiguration: REGIONAL
+      Variables:
+        stage: Staging
+  StagingApiKey:
+    Type: AWS::ApiGateway::ApiKey
+    Properties:
+      Enabled: true
+      Name: !Sub ${AWS::StackName}-StagingApiKey
+  StagingUsagePlan:
+    Type: AWS::ApiGateway::UsagePlan
+    Properties:
+      ApiStages:
+        - ApiId: !Ref StagingApi
+          Stage: !Ref StagingApi.Stage
+      UsagePlanName: !Sub ${AWS::StackName}-StagingUsagePlan
+  StagingUsagePlanKey:
+    Type: AWS::ApiGateway::UsagePlanKey
+    Properties:
+      KeyId: !Ref StagingApiKey
+      KeyType: API_KEY
+      UsagePlanId: !Ref StagingUsagePlan
   GetUnicorn:
     Type: AWS::Serverless::Function
     Properties:
@@ -63,12 +109,18 @@ Resources:
       Policies:
         - AWSXrayWriteOnlyAccess
       Events:
-        ProdApiGETunicorn:
+        ProductionApiGETunicorn:
           Type: Api
           Properties:
             Path: /unicorn
             Method: GET
             RestApiId: !Ref ProductionApi
+        StagingApiGETunicorn:
+          Type: Api
+          Properties:
+            Path: /unicorn
+            Method: GET
+            RestApiId: !Ref StagingApi
 Parameters:
   StackTagName:
     Type: String
