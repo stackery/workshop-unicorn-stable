@@ -50,13 +50,7 @@ Resources:
           Properties:
             Path: /unicorn
             Method: GET
-            RestApiId: !Ref ProdApi
-        StagingApiGETunicorn:
-          Type: Api
-          Properties:
-            Path: /unicorn
-            Method: GET
-            RestApiId: !Ref StagingApi
+            RestApiId: !Ref ProductionApi
 Parameters:
   StackTagName:
     Type: String
