@@ -29,6 +29,7 @@ Resources:
       Name: !Sub ${AWS::StackName}-ProductionApiKey
       StageKeys:
         - RestApiId: !Ref ProductionApi
+          StageName: !Ref ProductionApi.Stage
   GetUnicorn:
     Type: AWS::Serverless::Function
     Properties:
