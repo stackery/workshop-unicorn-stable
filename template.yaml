@@ -110,7 +110,7 @@ Resources:
   GetUnicorn:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub ${AWS::StackName}-GetUnicornDetails
+      FunctionName: !Sub ${AWS::StackName}-GetUnicorn
       Description: !Sub
         - Stack ${StackTagName} Environment ${EnvironmentTagName} Function ${ResourceName}
         - ResourceName: GetUnicorn
