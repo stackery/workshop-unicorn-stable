@@ -135,6 +135,8 @@ Resources:
             Path: /unicorn
             Method: GET
             RestApiId: !Ref StagingApi
+    Metadata:
+      StackeryName: GetUnicorn
   GetUnicornDetails:
     Type: AWS::Serverless::Function
     Properties:
