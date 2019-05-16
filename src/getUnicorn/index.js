@@ -53,3 +53,11 @@ exports.handler = async message => {
     body: JSON.stringify(unicorn)
   };
 }
+
+export detailsHandler = async event => {
+    console.log(event);
+    return {
+        statusCode: 200,
+        body: json.stringify(event)
+    }
+}
