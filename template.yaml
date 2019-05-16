@@ -26,6 +26,13 @@ Resources:
                 type: aws_proxy
                 uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetUnicorn.Arn}/invocations
               responses: {}
+          /unicorn/{Name}:
+            get:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetUnicornDetails.Arn}/invocations
+              responses: {}
       EndpointConfiguration: REGIONAL
       Variables:
         stage: production
@@ -72,6 +79,13 @@ Resources:
                 type: aws_proxy
                 uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetUnicorn.Arn}/invocations
               responses: {}
+          /unicorn/{Name}:
+            get:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetUnicornDetails.Arn}/invocations
+              responses: {}
       EndpointConfiguration: REGIONAL
       Variables:
         stage: staging
@@ -96,7 +110,7 @@ Resources:
   GetUnicorn:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub ${AWS::StackName}-GetUnicorn
+      FunctionName: !Sub ${AWS::StackName}-GetUnicornDetails
       Description: !Sub
         - Stack ${StackTagName} Environment ${EnvironmentTagName} Function ${ResourceName}
         - ResourceName: GetUnicorn
@@ -121,6 +135,36 @@ Resources:
             Path: /unicorn
             Method: GET
             RestApiId: !Ref StagingApi
+  GetUnicornDetails:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-GetUnicornDetails
+      Description: !Sub
+        - Stack ${StackTagName} Environment ${EnvironmentTagName} Function ${ResourceName}
+        - ResourceName: GetUnicornDetails
+      CodeUri: src/getUnicorn
+      Handler: index.detailHandler
+      Runtime: nodejs8.10
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Policies:
+        - AWSXrayWriteOnlyAccess
+      Events:
+        StagingApiGETunicornName:
+          Type: Api
+          Properties:
+            Path: /unicorn/{Name}
+            Method: GET
+            RestApiId: !Ref StagingApi
+        ProductionApiGETunicornName:
+          Type: Api
+          Properties:
+            Path: /unicorn/{Name}
+            Method: GET
+            RestApiId: !Ref ProductionApi
+    Metadata:
+      StackeryName: GetUnicornDetails
 Parameters:
   StackTagName:
     Type: String
