@@ -144,8 +144,8 @@ Resources:
       Description: !Sub
         - Stack ${StackTagName} Environment ${EnvironmentTagName} Function ${ResourceName}
         - ResourceName: GetUnicornDetails
-      CodeUri: src/getUnicorn
-      Handler: index.detailHandler
+      CodeUri: src/getUnicornDetails
+      Handler: index.handler
       Runtime: nodejs8.10
       MemorySize: 3008
       Timeout: 30
